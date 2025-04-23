@@ -5,6 +5,8 @@ on:
 
 jobs:
   build-crowdedmod:
+    # Speed up development
+    if: false
     name: Build CrowdedMod
     runs-on: ubuntu-latest
     steps:
@@ -65,8 +67,9 @@ jobs:
 
   build:
     name: Build modpack
-    needs:
-      - build-crowdedmod
+    # TODO: Uncomment once zipping is figured out
+    # needs:
+    #   - build-crowdedmod
     runs-on: ubuntu-latest
     steps:
       - name: Install APT deps
@@ -80,8 +83,8 @@ jobs:
 
       - name: Set env
         run: |
-          echo "BUILD_DIR=build/src" >> $GITHUB_ENV
-          echo "BUILD_PKG=build/modpack.zip" >> $GITHUB_ENV
+          echo "BUILD_DIR=$(readlink -f build/src)" >> $GITHUB_ENV
+          echo "BUILD_PKG=$(readlink -f build/modpack.zip)" >> $GITHUB_ENV
 
       - name: Create build directory structure
         run: mkdir -p ${{ env.BUILD_DIR }}
@@ -104,9 +107,9 @@ jobs:
           cp icon.png ${{ env.BUILD_DIR }}
           cp README.md ${{ env.BUILD_DIR }}
 
-      - name: Create BepInEx plugins dir
-        run: |
-          mkdir -p ${{ env.BUILD_DIR }}/BepInEx/plugins
+      # - name: Create BepInEx plugins dir
+      #   run: |
+      #     mkdir -p ${{ env.BUILD_DIR }}/BepInEx/plugins
 
       - name: Download CrowdedMod build
         uses: actions/download-artifact@v4
@@ -126,7 +129,7 @@ jobs:
 
       - name: Build deliverable
         working-directory: ${{ env.BUILD_DIR }}
-        run: zip -r ${{ env.BUILD_PKG }} ./*
+        run: zip -r $(${{ env.BUILD_PKG }}) ./*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
