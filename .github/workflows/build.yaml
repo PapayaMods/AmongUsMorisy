@@ -69,7 +69,7 @@ jobs:
       - build-crowdedmod
     runs-on: ubuntu-latest
     steps:
-      - name: Install apt deps
+      - name: Install APT deps
         run: |
           sudo apt install tree -y
 
@@ -125,7 +125,7 @@ jobs:
           tree ${{ env.BUILD_DIR }}
 
       - name: Build deliverable
-        run: zip -j -r ${{ env.BUILD_PKG }} ${{ env.BUILD_DIR }}/*
+        run: zip -r ${{ env.BUILD_PKG }} ${{ env.BUILD_DIR }}/*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
