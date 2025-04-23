@@ -35,6 +35,8 @@ jobs:
 
   build:
     name: Build
+    needs:
+      - build-crowdedmod
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
