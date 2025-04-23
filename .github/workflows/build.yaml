@@ -4,41 +4,128 @@ on:
   workflow_call:
 
 jobs:
-  build:
-    name: Build
+  build-crowdedmod:
+    name: Build CrowdedMod
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        name: Checkout CrowdedMod
+        with:  
+          repository: 'CrowdedMods/CrowdedMod'
+          ref: '2.10.0'
+          submodules: true
+          fetch-depth: 1
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+
+      - name: Run the Cake script
+        uses: cake-build/cake-action@v1
+        with:
+          verbosity: Diagnostic
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: crowdedmod
+          path: src/CrowdedMod/bin/Release/net6.0/CrowdedMod.dll
+          if-no-files-found: error
+          overwrite: false
+
+  # build-townofusr:
+  #   name: Build TownOfUsR
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       name: Checkout CrowdedMod
+  #       with:  
+  #         repository: 'eDonnes124/Town-Of-Us-R'
+  #         ref: 'v5.2.0'
+
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: 8.x
+  #         cache: true
+
+  #     - run: dotnet restore --locked-mode
+
+  #     - name: Build 
+  #       run: dotnet build --configuration Release TownOfUs.sln
+
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: townofusr
+  #         path: source/bin/Release/net6.0/TownOfUs.dll
+  #         if-no-files-found: error
+  #         overwrite: false
+
+  build:
+    name: Build modpack
+    needs:
+      - build-crowdedmod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install APT deps
+        run: |
+          sudo apt install tree -y
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Set env
         run: |
-          echo "BUILD_SRC=build/src" >> $GITHUB_ENV
-          echo "BUILD_PKG=build/modpack.zip" >> $GITHUB_ENV
+          echo "BUILD_DIR=${GITHUB_WORKSPACE}/build/src" >> $GITHUB_ENV
+          echo "BUILD_PKG=${GITHUB_WORKSPACE}/build/modpack.zip" >> $GITHUB_ENV
 
       - name: Create build directory structure
-        run: mkdir -p ${{ env.BUILD_SRC }}
+        run: mkdir -p ${{ env.BUILD_DIR }}
 
       - name: Render manifest.json
         uses: cuchi/jinja2-action@v1.3.0
         with:
           template: manifest.json.j2
-          output_file: ${{ env.BUILD_SRC }}/manifest.json
+          output_file: ${{ env.BUILD_DIR }}/manifest.json
           strict: true
           variables: |
             version_number=${{ github.ref_name }}
             website_url=${{ github.server_url }}/${{ github.repository }}
 
       - name: Print rendered manifest.json
-        run: cat ${{ env.BUILD_SRC }}/manifest.json
+        run: cat ${{ env.BUILD_DIR }}/manifest.json
 
-      - name: Copy sources
+      - name: Copy static sources
         run: |
-          cp icon.png ${{ env.BUILD_SRC }}
-          cp README.md ${{ env.BUILD_SRC }}
+          cp -v icon.png README.md ${{ env.BUILD_DIR }}
+
+      # - name: Create BepInEx plugins dir
+      #   run: |
+      #     mkdir -p ${{ env.BUILD_DIR }}/BepInEx/plugins
+
+      - name: Download CrowdedMod build
+        uses: actions/download-artifact@v4
+        with:
+          name: crowdedmod
+          path: ${{ env.BUILD_DIR }}/BepInEx/plugins
+      
+      # - name: Download TownOfUsR build
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: crowdedmod
+      #     path: ${{ env.BUILD_DIR }}/
+
+      - name: Print build tree
+        run: |
+          tree ${{ env.BUILD_DIR }}
 
       - name: Build deliverable
-        run: zip -j -r ${{ env.BUILD_PKG }} ${{ env.BUILD_SRC }}/*
+        working-directory: ${{ env.BUILD_DIR }}
+        run: zip -r ${{ env.BUILD_PKG }} ./*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
