@@ -16,6 +16,15 @@ jobs:
           submodules: true
           fetch-depth: 1
 
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.cache/bepinex
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+              
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -30,7 +39,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: crowdedmod
-          path: src/CrowdedMod/bin/Release/net6.0/CrowdedMod.dll
+          path: |
+            src/CrowdedMod/bin/Release/net6.0/CrowdedMod.dll
           if-no-files-found: error
           overwrite: false
           retention-days: 1
@@ -45,6 +55,15 @@ jobs:
           repository: "eDonnes124/Town-Of-Us-R"
           ref: "v5.2.0"
           fetch-depth: 1
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.cache/bepinex
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
