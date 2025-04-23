@@ -5,8 +5,6 @@ on:
 
 jobs:
   build-crowdedmod:
-    # Speed up development
-    if: false
     name: Build CrowdedMod
     runs-on: ubuntu-latest
     steps:
@@ -67,9 +65,8 @@ jobs:
 
   build:
     name: Build modpack
-    # TODO: Uncomment once zipping is figured out
-    # needs:
-    #   - build-crowdedmod
+    needs:
+      - build-crowdedmod
     runs-on: ubuntu-latest
     steps:
       - name: Install APT deps
@@ -110,11 +107,11 @@ jobs:
       #   run: |
       #     mkdir -p ${{ env.BUILD_DIR }}/BepInEx/plugins
 
-      # - name: Download CrowdedMod build
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: crowdedmod
-      #     path: ${{ env.BUILD_DIR }}/BepInEx/plugins
+      - name: Download CrowdedMod build
+        uses: actions/download-artifact@v4
+        with:
+          name: crowdedmod
+          path: ${{ env.BUILD_DIR }}/BepInEx/plugins
       
       # - name: Download TownOfUsR build
       #   uses: actions/download-artifact@v4
