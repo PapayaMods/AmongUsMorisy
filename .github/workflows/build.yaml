@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        name: Checkout CrowdedMod
+        name: Checkout
         with:
           repository: "CrowdedMods/CrowdedMod"
           ref: "2.10.0"
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        name: Checkout CrowdedMod
+        name: Checkout
         with:
           repository: "eDonnes124/Town-Of-Us-R"
           ref: "v5.2.0"
@@ -49,7 +49,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.x
-          cache: true
 
       - run: dotnet restore TownOfUs.sln
 
