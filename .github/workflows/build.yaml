@@ -44,11 +44,29 @@ jobs:
 
       - name: Set env
         run: |
-          echo "BUILD_SRC=build/src" >> $GITHUB_ENV
+          echo "BUILD_DIR=build/src" >> $GITHUB_ENV
           echo "BUILD_PKG=build/modpack.zip" >> $GITHUB_ENV
 
       - name: Create build directory structure
-        run: mkdir -p ${{ env.BUILD_SRC }}
+        run: mkdir -p ${{ env.BUILD_DIR }}
+
+      - name: Render manifest.json
+        uses: cuchi/jinja2-action@v1.3.0
+        with:
+          template: manifest.json.j2
+          output_file: ${{ env.BUILD_DIR }}/manifest.json
+          strict: true
+          variables: |
+            version_number=${{ github.ref_name }}
+            website_url=${{ github.server_url }}/${{ github.repository }}
+
+      - name: Print rendered manifest.json
+        run: cat ${{ env.BUILD_DIR }}/manifest.json
+
+      - name: Copy static sources
+        run: |
+          cp icon.png ${{ env.BUILD_DIR }}
+          cp README.md ${{ env.BUILD_DIR }}
 
       - name: Download CrowdedMod build
         uses: actions/download-artifact@v4
@@ -56,26 +74,8 @@ jobs:
           name: crowdedmod
           path: ${{ env.BUILD_DIR }}
 
-      - name: Render manifest.json
-        uses: cuchi/jinja2-action@v1.3.0
-        with:
-          template: manifest.json.j2
-          output_file: ${{ env.BUILD_SRC }}/manifest.json
-          strict: true
-          variables: |
-            version_number=${{ github.ref_name }}
-            website_url=${{ github.server_url }}/${{ github.repository }}
-
-      - name: Print rendered manifest.json
-        run: cat ${{ env.BUILD_SRC }}/manifest.json
-
-      - name: Copy sources
-        run: |
-          cp icon.png ${{ env.BUILD_SRC }}
-          cp README.md ${{ env.BUILD_SRC }}
-
       - name: Build deliverable
-        run: zip -j -r ${{ env.BUILD_PKG }} ${{ env.BUILD_SRC }}/*
+        run: zip -j -r ${{ env.BUILD_PKG }} ${{ env.BUILD_DIR }}/*
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
