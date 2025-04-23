@@ -34,3 +34,9 @@ jobs:
 
       - name: Check presence of README.md
         run: test -f ${{ env.UNZIPPED_DIR }}/README.md
+
+      - name: Check presence of CrowdedMod
+        run: test -f ${{ env.UNZIPPED_DIR }}/BepInEx/plugins/CrowdedMod.dll
+
+      - name: Check presence of TownOfUs
+        run: test -f ${{ env.UNZIPPED_DIR }}/BepInEx/plugins/TownOfUs.dll
