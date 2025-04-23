@@ -20,8 +20,6 @@ jobs:
         with:
           dotnet-version: 8.x
           cache: true
-      
-      - run: dotnet restore --locked-mode
 
       - name: Run the Cake script
         uses: cake-build/cake-action@v1
