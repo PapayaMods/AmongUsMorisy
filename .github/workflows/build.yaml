@@ -66,8 +66,8 @@ jobs:
           overwrite: false
           retention-days: 1
 
-  modpack:
-    name: Modpack
+  morisy:
+    name: Morisy
     needs:
       - crowdedmod
       - townofusr
@@ -130,7 +130,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: package
+          name: morisy
           path: ${{ env.BUILD_PKG }}
           if-no-files-found: error
           overwrite: false
