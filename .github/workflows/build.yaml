@@ -117,7 +117,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: townofusr
-          path: ${{ env.BUILD_DIR }}/BepInEx/plugins
+          path: ${{ env.BUILD_DIR }}
 
       - name: Print build tree
         run: |
