@@ -40,3 +40,6 @@ jobs:
 
       - name: Check presence of TownOfUs
         run: test -f ${{ env.UNZIPPED_DIR }}/BepInEx/plugins/TownOfUs.dll
+
+      - name: Check presence of TownOfUs
+        run: test -f ${{ env.UNZIPPED_DIR }}/BepInEx/plugins/Reactor.dll

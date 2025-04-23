@@ -44,6 +44,7 @@ jobs:
         with:
           repository: "eDonnes124/Town-Of-Us-R"
           ref: "v5.2.0"
+          fetch-depth: 1
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -66,11 +67,53 @@ jobs:
           overwrite: false
           retention-days: 1
 
+  reactor:
+    name: Reactor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+        with:
+          repository: "NuclearPowered/Reactor"
+          ref: "2.4.0"
+          submodules: true
+          fetch-depth: 1
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.nuget/packages
+            ~/.cache/bepinex
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
+
+      - name: Run the Cake script
+        uses: cake-build/cake-action@v3
+        with:
+          verbosity: Diagnostic
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: reactor.dll
+          path: |
+            Reactor/bin/Release/net6.0/Reactor.dll
+          if-no-files-found: error
+          overwrite: false
+          retention-days: 1
+
   morisy:
     name: Morisy
     needs:
       - crowdedmod
       - townofusr
+      - reactor
     runs-on: ubuntu-latest
     steps:
       - name: Install APT deps
@@ -118,6 +161,12 @@ jobs:
         with:
           name: townofusr
           path: ${{ env.BUILD_DIR }}
+
+      - name: Download CrowdedMod build
+        uses: actions/download-artifact@v4
+        with:
+          name: reactor.dll
+          path: ${{ env.BUILD_DIR }}/BepInEx/plugins
 
       - name: Print build tree
         run: |
