@@ -4,6 +4,35 @@ on:
   workflow_call:
 
 jobs:
+  build-crowdedmod:
+    name: Build CrowdedMod
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout CrowdedMod
+        with:  
+          repository: 'CrowdedMods/CrowdedMod'
+          ref: '2.10.0'
+          submodules: true
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 8.x
+
+      - name: Run the Cake script
+        uses: cake-build/cake-action@v1
+        with:
+          verbosity: Diagnostic
+      
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: crowdedmod
+          path: src/CrowdedMod/bin/Release/net6.0/CrowdedMod.dll
+          if-no-files-found: error
+          overwrite: false
+
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -19,23 +48,11 @@ jobs:
       - name: Create build directory structure
         run: mkdir -p ${{ env.BUILD_SRC }}
 
-      - uses: actions/checkout@v4
-        name: Checkout CrowdedMod
-        with:  
-          repository: 'CrowdedMods/CrowdedMod'
-          ref: '2.10.0'
-          path: ./CrowdedMod
-          submodules: true
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v2
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
-          dotnet-version: 8.x
-  
-      - name: Run the Cake script
-        uses: cake-build/cake-action@v1
-        with:
-          verbosity: Diagnostic
+          name: crowdedmod
+          path: ${{ env.BUILD_DIR }}
 
       - name: Render manifest.json
         uses: cuchi/jinja2-action@v1.3.0
