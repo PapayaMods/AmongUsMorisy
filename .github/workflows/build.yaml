@@ -16,9 +16,12 @@ jobs:
           submodules: true
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.x
+          cache: true
+      
+      - run: dotnet restore --locked-mode
 
       - name: Run the Cake script
         uses: cake-build/cake-action@v1
@@ -32,6 +35,35 @@ jobs:
           path: src/CrowdedMod/bin/Release/net6.0/CrowdedMod.dll
           if-no-files-found: error
           overwrite: false
+
+  # build-townofusr:
+  #   name: Build TownOfUsR
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       name: Checkout CrowdedMod
+  #       with:  
+  #         repository: 'eDonnes124/Town-Of-Us-R'
+  #         ref: 'v5.2.0'
+
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: 8.x
+  #         cache: true
+
+  #     - run: dotnet restore --locked-mode
+
+  #     - name: Build 
+  #       run: dotnet build --configuration Release TownOfUs.sln
+
+  #     - name: Upload artifacts
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: townofusr
+  #         path: source/bin/Release/net6.0/TownOfUs.dll
+  #         if-no-files-found: error
+  #         overwrite: false
 
   build:
     name: Build modpack
@@ -73,6 +105,12 @@ jobs:
         with:
           name: crowdedmod
           path: ${{ env.BUILD_DIR }}/BepInEx/plugins
+      
+      # - name: Download TownOfUsR build
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: crowdedmod
+      #     path: ${{ env.BUILD_DIR }}/
 
       - name: Build deliverable
         run: zip -j -r ${{ env.BUILD_PKG }} ${{ env.BUILD_DIR }}/*
