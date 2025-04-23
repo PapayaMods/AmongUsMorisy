@@ -36,9 +36,4 @@ jobs:
           categories: |
             modpacks,
             tools,
-            audio,
-            suits,
-            emotes,
-            serverside,
-            clientside,
             misc
