@@ -20,7 +20,7 @@ jobs:
         run: mkdir -p ${{ env.BUILD_SRC }}
 
       - name: Render manifest.json
-        uses: cuchi/jinja2-action@v1.2.2
+        uses: cuchi/jinja2-action@v1.3.0
         with:
           template: manifest.json.j2
           output_file: ${{ env.BUILD_SRC }}/manifest.json
