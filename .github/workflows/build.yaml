@@ -97,6 +97,10 @@ jobs:
           cp icon.png ${{ env.BUILD_DIR }}
           cp README.md ${{ env.BUILD_DIR }}
 
+      - name: Create BepInEx plugins dir
+        run: |
+          mkdir -p ${{ env.BUILD_DIR }}/BepInEx/plugins
+
       - name: Download CrowdedMod build
         uses: actions/download-artifact@v4
         with:
