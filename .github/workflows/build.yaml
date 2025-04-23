@@ -111,11 +111,11 @@ jobs:
       #   run: |
       #     mkdir -p ${{ env.BUILD_DIR }}/BepInEx/plugins
 
-      - name: Download CrowdedMod build
-        uses: actions/download-artifact@v4
-        with:
-          name: crowdedmod
-          path: ${{ env.BUILD_DIR }}/BepInEx/plugins
+      # - name: Download CrowdedMod build
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: crowdedmod
+      #     path: ${{ env.BUILD_DIR }}/BepInEx/plugins
       
       # - name: Download TownOfUsR build
       #   uses: actions/download-artifact@v4
