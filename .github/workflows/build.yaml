@@ -72,7 +72,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: crowdedmod
-          path: ${{ env.BUILD_DIR }}
+          path: ${{ env.BUILD_DIR }}/BepInEx/plugins
 
       - name: Build deliverable
         run: zip -j -r ${{ env.BUILD_PKG }} ${{ env.BUILD_DIR }}/*
