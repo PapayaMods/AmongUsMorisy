@@ -20,7 +20,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: package
+          name: morisy
           path: ${{ env.BUILD_DIR }}
 
       - name: Unzip modpack

@@ -4,15 +4,15 @@ on:
   workflow_call:
 
 jobs:
-  build-crowdedmod:
-    name: Build CrowdedMod
+  crowdedmod:
+    name: CrowdedMod
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        name: Checkout CrowdedMod
-        with:  
-          repository: 'CrowdedMods/CrowdedMod'
-          ref: '2.10.0'
+        name: Checkout
+        with:
+          repository: "CrowdedMods/CrowdedMod"
+          ref: "2.10.0"
           submodules: true
           fetch-depth: 1
 
@@ -25,7 +25,7 @@ jobs:
         uses: cake-build/cake-action@v1
         with:
           verbosity: Diagnostic
-      
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -33,40 +33,44 @@ jobs:
           path: src/CrowdedMod/bin/Release/net6.0/CrowdedMod.dll
           if-no-files-found: error
           overwrite: false
+          retention-days: 1
 
-  # build-townofusr:
-  #   name: Build TownOfUsR
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       name: Checkout CrowdedMod
-  #       with:  
-  #         repository: 'eDonnes124/Town-Of-Us-R'
-  #         ref: 'v5.2.0'
+  townofusr:
+    name: TownOfUsR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+        with:
+          repository: "eDonnes124/Town-Of-Us-R"
+          ref: "v5.2.0"
 
-  #     - name: Setup .NET
-  #       uses: actions/setup-dotnet@v4
-  #       with:
-  #         dotnet-version: 8.x
-  #         cache: true
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.x
 
-  #     - run: dotnet restore --locked-mode
+      - run: dotnet restore TownOfUs.sln
 
-  #     - name: Build 
-  #       run: dotnet build --configuration Release TownOfUs.sln
+      - name: Build
+        working-directory: ./source
+        run: dotnet msbuild -p:Configuration=Release -p:AmongUs=build
 
-  #     - name: Upload artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: townofusr
-  #         path: source/bin/Release/net6.0/TownOfUs.dll
-  #         if-no-files-found: error
-  #         overwrite: false
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: townofusr
+          path: |
+            source/build
+          if-no-files-found: error
+          overwrite: false
+          retention-days: 1
 
-  build:
-    name: Build modpack
+  morisy:
+    name: Morisy
     needs:
-      - build-crowdedmod
+      - crowdedmod
+      - townofusr
     runs-on: ubuntu-latest
     steps:
       - name: Install APT deps
@@ -103,21 +107,17 @@ jobs:
         run: |
           cp -v icon.png README.md ${{ env.BUILD_DIR }}
 
-      # - name: Create BepInEx plugins dir
-      #   run: |
-      #     mkdir -p ${{ env.BUILD_DIR }}/BepInEx/plugins
-
       - name: Download CrowdedMod build
         uses: actions/download-artifact@v4
         with:
           name: crowdedmod
           path: ${{ env.BUILD_DIR }}/BepInEx/plugins
-      
-      # - name: Download TownOfUsR build
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: crowdedmod
-      #     path: ${{ env.BUILD_DIR }}/
+
+      - name: Download TownOfUsR build
+        uses: actions/download-artifact@v4
+        with:
+          name: townofusr
+          path: ${{ env.BUILD_DIR }}
 
       - name: Print build tree
         run: |
@@ -130,7 +130,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: package
+          name: morisy
           path: ${{ env.BUILD_PKG }}
           if-no-files-found: error
           overwrite: false
