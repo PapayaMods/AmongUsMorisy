@@ -21,7 +21,7 @@ jobs:
           path: |
             ~/.nuget/packages
             ~/.cache/bepinex
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/nuget.config') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
               
@@ -61,7 +61,7 @@ jobs:
           path: |
             ~/.nuget/packages
             ~/.cache/bepinex
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/NuGet.Config') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
 
