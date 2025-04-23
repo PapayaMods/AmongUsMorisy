@@ -104,8 +104,7 @@ jobs:
 
       - name: Copy static sources
         run: |
-          cp icon.png ${{ env.BUILD_DIR }}
-          cp README.md ${{ env.BUILD_DIR }}
+          cp -v icon.png README.md ${{ env.BUILD_DIR }}
 
       # - name: Create BepInEx plugins dir
       #   run: |
