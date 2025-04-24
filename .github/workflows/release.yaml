@@ -38,9 +38,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          export ASSET="morisy-${{ github.ref_name }}.zip"
+          export ASSET="${{ github.event.repository.name }}-${{ github.ref_name }}.zip"
           cp -v "${{ env.BUILD_PKG }}" "${ASSET}"
-          gh release upload --repo ${{ env.GITHUB_ACTION_REPOSITORY }} ${{ github.ref_name }} "${ASSET}"
+          gh release upload --repo ${{ env.GITHUB_REPOSITORY }} ${{ github.ref_name }} "${ASSET}"
 
       - name: Upload Thunderstore package
         uses: GreenTF/upload-thunderstore-package@v4.3
