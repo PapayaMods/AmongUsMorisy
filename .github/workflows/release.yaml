@@ -4,6 +4,9 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     uses: ./.github/workflows/build.yaml
@@ -27,6 +30,15 @@ jobs:
         with:
           name: morisy
           path: ${{ env.BUILD_DIR }}
+
+      - name: Copy modpack.zip to release-tagged zip
+        run: |
+
+      - name: Upload release asset
+        run: |
+          export ASSET="morisy-${{ github.ref_name }}.zip"
+          cp -v "${{ env.BUILD_PKG }}" "${ASSET}"
+          gh release upload ${{ github.ref_name }} "${ASSET}"
 
       - name: Upload Thunderstore package
         uses: GreenTF/upload-thunderstore-package@v4.3
